@@ -1,0 +1,16 @@
+MajorID,Name,DepartmentID
+1,Printmaker,8
+2,Pharmacologist,9
+3,"Librarian, public",7
+4,"Scientist, physiological",4
+5,Race relations officer,8
+6,Radiation protection practitioner,10
+7,"Doctor, hospital",7
+8,Town planner,4
+9,Speech and language therapist,1
+10,Technical sales engineer,9
+11,"Clinical scientist, histocompatibility and immunogenetics",4
+12,Environmental consultant,8
+13,Psychiatric nurse,5
+14,"Psychologist, clinical",6
+15,Estate agent,10
