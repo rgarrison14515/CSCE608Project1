@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StudentRecordsAPI.Data;
 using StudentRecordsAPI.Models;
+using StudentRecordsAPI.Services;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace StudentRecordsAPI.Controllers
@@ -12,37 +10,29 @@ namespace StudentRecordsAPI.Controllers
     [ApiController]
     public class StudentCourseController : ControllerBase
     {
-        private readonly StudentRecordsContext _context;
+        private readonly StudentCourseService _studentCourseService;
 
-        public StudentCourseController(StudentRecordsContext context)
+        public StudentCourseController(StudentCourseService studentCourseService)
         {
-            _context = context;
+            _studentCourseService = studentCourseService;
         }
 
         // GET: api/StudentCourse
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentCourse>>> GetStudentCourses()
         {
-            return await _context.StudentCourses
-                .Include(sc => sc.Student)
-                .Include(sc => sc.Course)
-                .ToListAsync();
+            return await _studentCourseService.GetStudentCoursesAsync();
         }
 
         // GET: api/StudentCourse/{studentId}/{courseId}
         [HttpGet("{studentId}/{courseId}")]
         public async Task<ActionResult<StudentCourse>> GetStudentCourse(string studentId, int courseId)
         {
-            var studentCourse = await _context.StudentCourses
-                .Include(sc => sc.Student)
-                .Include(sc => sc.Course)
-                .FirstOrDefaultAsync(sc => sc.StudentID == studentId && sc.CourseID == courseId);
-
+            var studentCourse = await _studentCourseService.GetStudentCourseAsync(studentId, courseId);
             if (studentCourse == null)
             {
                 return NotFound();
             }
-
             return studentCourse;
         }
 
@@ -50,25 +40,10 @@ namespace StudentRecordsAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<StudentCourse>> PostStudentCourse(StudentCourse studentCourse)
         {
-            if (!_context.Students.Any(s => s.StudentID == studentCourse.StudentID))
+            var addedStudentCourse = await _studentCourseService.AddStudentCourseAsync(studentCourse);
+            if (addedStudentCourse == null)
             {
-                return BadRequest("Student does not exist.");
-            }
-
-            if (!_context.Courses.Any(c => c.CourseID == studentCourse.CourseID))
-            {
-                return BadRequest("Course does not exist.");
-            }
-
-            _context.StudentCourses.Add(studentCourse);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return Conflict("This student is already enrolled in the course.");
+                return Conflict("Student or Course does not exist, or the student is already enrolled.");
             }
 
             return CreatedAtAction(nameof(GetStudentCourse), new { studentId = studentCourse.StudentID, courseId = studentCourse.CourseID }, studentCourse);
@@ -78,15 +53,11 @@ namespace StudentRecordsAPI.Controllers
         [HttpDelete("{studentId}/{courseId}")]
         public async Task<IActionResult> DeleteStudentCourse(string studentId, int courseId)
         {
-            var studentCourse = await _context.StudentCourses.FindAsync(studentId, courseId);
-            if (studentCourse == null)
+            var deleted = await _studentCourseService.DeleteStudentCourseAsync(studentId, courseId);
+            if (!deleted)
             {
                 return NotFound();
             }
-
-            _context.StudentCourses.Remove(studentCourse);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

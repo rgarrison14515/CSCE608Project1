@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StudentRecordsAPI.Data;
 using StudentRecordsAPI.Models;
+using StudentRecordsAPI.Services;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace StudentRecordsAPI.Controllers
@@ -12,37 +10,29 @@ namespace StudentRecordsAPI.Controllers
     [ApiController]
     public class FacultyController : ControllerBase
     {
-        private readonly StudentRecordsContext _context;
+        private readonly FacultyService _facultyService;
 
-        public FacultyController(StudentRecordsContext context)
+        public FacultyController(FacultyService facultyService)
         {
-            _context = context;
+            _facultyService = facultyService;
         }
 
         // GET: api/Faculty
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Faculty>>> GetFaculty()
         {
-            return await _context.Faculty
-                .Include(f => f.Department)
-                .Include(f => f.Courses)
-                .ToListAsync();
+            return await _facultyService.GetFacultyAsync();
         }
 
         // GET: api/Faculty/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Faculty>> GetFacultyById(int id)
         {
-            var faculty = await _context.Faculty
-                .Include(f => f.Department)
-                .Include(f => f.Courses)
-                .FirstOrDefaultAsync(f => f.FacultyID == id);
-
+            var faculty = await _facultyService.GetFacultyByIdAsync(id);
             if (faculty == null)
             {
                 return NotFound();
             }
-
             return faculty;
         }
 
@@ -50,39 +40,19 @@ namespace StudentRecordsAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Faculty>> PostFaculty(Faculty faculty)
         {
-            _context.Faculty.Add(faculty);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetFacultyById), new { id = faculty.FacultyID }, faculty);
+            var newFaculty = await _facultyService.AddFacultyAsync(faculty);
+            return CreatedAtAction(nameof(GetFacultyById), new { id = newFaculty.FacultyID }, newFaculty);
         }
 
         // PUT: api/Faculty/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutFaculty(int id, Faculty faculty)
         {
-            if (id != faculty.FacultyID)
+            var updated = await _facultyService.UpdateFacultyAsync(id, faculty);
+            if (!updated)
             {
-                return BadRequest();
+                return NotFound();
             }
-
-            _context.Entry(faculty).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Faculty.Any(e => e.FacultyID == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return NoContent();
         }
 
@@ -90,15 +60,11 @@ namespace StudentRecordsAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFaculty(int id)
         {
-            var faculty = await _context.Faculty.FindAsync(id);
-            if (faculty == null)
+            var deleted = await _facultyService.DeleteFacultyAsync(id);
+            if (!deleted)
             {
                 return NotFound();
             }
-
-            _context.Faculty.Remove(faculty);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

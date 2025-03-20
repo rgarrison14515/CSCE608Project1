@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentRecordsAPI.Models
 {
+    [Table("Course")] // 👈 Explicitly map to "Course" table
     public class Course
     {
         [Key]

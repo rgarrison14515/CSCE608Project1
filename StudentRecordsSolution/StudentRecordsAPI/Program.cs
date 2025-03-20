@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StudentRecordsAPI.Data;
+using StudentRecordsAPI.Services; // Import the service
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,16 @@ builder.Services.AddSwaggerGen();
 // Add DbContext to use SQL Server
 builder.Services.AddDbContext<StudentRecordsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register services
+builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<DepartmentService>();
+builder.Services.AddScoped<FacultyService>();
+builder.Services.AddScoped<TermService>();
+builder.Services.AddScoped<MajorService>();
+builder.Services.AddScoped<StudentCourseService>();
+builder.Services.AddScoped<StudentMajorService>();
 
 var app = builder.Build();
 

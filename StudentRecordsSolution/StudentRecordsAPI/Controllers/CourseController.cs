@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StudentRecordsAPI.Data;
 using StudentRecordsAPI.Models;
+using StudentRecordsAPI.Services;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace StudentRecordsAPI.Controllers
@@ -12,39 +10,29 @@ namespace StudentRecordsAPI.Controllers
     [ApiController]
     public class CourseController : ControllerBase
     {
-        private readonly StudentRecordsContext _context;
+        private readonly CourseService _courseService;
 
-        public CourseController(StudentRecordsContext context)
+        public CourseController(CourseService courseService)
         {
-            _context = context;
+            _courseService = courseService;
         }
 
         // GET: api/Course
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
         {
-            return await _context.Courses
-                .Include(c => c.Department)
-                .Include(c => c.Faculty)
-                .Include(c => c.Term)
-                .ToListAsync();
+            return await _courseService.GetCoursesAsync();
         }
 
         // GET: api/Course/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Course>> GetCourse(int id)
         {
-            var course = await _context.Courses
-                .Include(c => c.Department)
-                .Include(c => c.Faculty)
-                .Include(c => c.Term)
-                .FirstOrDefaultAsync(c => c.CourseID == id);
-
+            var course = await _courseService.GetCourseByIdAsync(id);
             if (course == null)
             {
                 return NotFound();
             }
-
             return course;
         }
 
@@ -52,39 +40,19 @@ namespace StudentRecordsAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Course>> PostCourse(Course course)
         {
-            _context.Courses.Add(course);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetCourse), new { id = course.CourseID }, course);
+            var newCourse = await _courseService.AddCourseAsync(course);
+            return CreatedAtAction(nameof(GetCourse), new { id = newCourse.CourseID }, newCourse);
         }
 
         // PUT: api/Course/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCourse(int id, Course course)
         {
-            if (id != course.CourseID)
+            var updated = await _courseService.UpdateCourseAsync(id, course);
+            if (!updated)
             {
-                return BadRequest();
+                return NotFound();
             }
-
-            _context.Entry(course).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Courses.Any(e => e.CourseID == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return NoContent();
         }
 
@@ -92,16 +60,33 @@ namespace StudentRecordsAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
+            var deleted = await _courseService.DeleteCourseAsync(id);
+            if (!deleted)
             {
                 return NotFound();
             }
-
-            _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
-
             return NoContent();
+        }
+
+        // GET: api/Course/faculty/{facultyId}
+        [HttpGet("faculty/{facultyId}")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByFaculty(int facultyId)
+        {
+            return await _courseService.GetCoursesByFacultyAsync(facultyId);
+        }
+
+        // GET: api/Course/department/{departmentId}
+        [HttpGet("department/{departmentId}")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByDepartment(int departmentId)
+        {
+            return await _courseService.GetCoursesByDepartmentAsync(departmentId);
+        }
+
+        // GET: api/Course/term/{termId}
+        [HttpGet("term/{termId}")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByTerm(int termId)
+        {
+            return await _courseService.GetCoursesByTermAsync(termId);
         }
     }
 }

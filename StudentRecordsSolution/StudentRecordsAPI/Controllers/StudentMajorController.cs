@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StudentRecordsAPI.Data;
 using StudentRecordsAPI.Models;
+using StudentRecordsAPI.Services;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace StudentRecordsAPI.Controllers
@@ -12,37 +10,29 @@ namespace StudentRecordsAPI.Controllers
     [ApiController]
     public class StudentMajorController : ControllerBase
     {
-        private readonly StudentRecordsContext _context;
+        private readonly StudentMajorService _studentMajorService;
 
-        public StudentMajorController(StudentRecordsContext context)
+        public StudentMajorController(StudentMajorService studentMajorService)
         {
-            _context = context;
+            _studentMajorService = studentMajorService;
         }
 
         // GET: api/StudentMajor
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentMajor>>> GetStudentMajors()
         {
-            return await _context.StudentMajors
-                .Include(sm => sm.Student)
-                .Include(sm => sm.Major)
-                .ToListAsync();
+            return await _studentMajorService.GetStudentMajorsAsync();
         }
 
         // GET: api/StudentMajor/{studentId}/{majorId}
         [HttpGet("{studentId}/{majorId}")]
         public async Task<ActionResult<StudentMajor>> GetStudentMajor(string studentId, int majorId)
         {
-            var studentMajor = await _context.StudentMajors
-                .Include(sm => sm.Student)
-                .Include(sm => sm.Major)
-                .FirstOrDefaultAsync(sm => sm.StudentID == studentId && sm.MajorID == majorId);
-
+            var studentMajor = await _studentMajorService.GetStudentMajorAsync(studentId, majorId);
             if (studentMajor == null)
             {
                 return NotFound();
             }
-
             return studentMajor;
         }
 
@@ -50,25 +40,10 @@ namespace StudentRecordsAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<StudentMajor>> PostStudentMajor(StudentMajor studentMajor)
         {
-            if (!_context.Students.Any(s => s.StudentID == studentMajor.StudentID))
+            var addedStudentMajor = await _studentMajorService.AddStudentMajorAsync(studentMajor);
+            if (addedStudentMajor == null)
             {
-                return BadRequest("Student does not exist.");
-            }
-
-            if (!_context.Majors.Any(m => m.MajorID == studentMajor.MajorID))
-            {
-                return BadRequest("Major does not exist.");
-            }
-
-            _context.StudentMajors.Add(studentMajor);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return Conflict("This student is already assigned to this major.");
+                return Conflict("Student or Major does not exist, or the student is already assigned.");
             }
 
             return CreatedAtAction(nameof(GetStudentMajor), new { studentId = studentMajor.StudentID, majorId = studentMajor.MajorID }, studentMajor);
@@ -78,15 +53,11 @@ namespace StudentRecordsAPI.Controllers
         [HttpDelete("{studentId}/{majorId}")]
         public async Task<IActionResult> DeleteStudentMajor(string studentId, int majorId)
         {
-            var studentMajor = await _context.StudentMajors.FindAsync(studentId, majorId);
-            if (studentMajor == null)
+            var deleted = await _studentMajorService.DeleteStudentMajorAsync(studentId, majorId);
+            if (!deleted)
             {
                 return NotFound();
             }
-
-            _context.StudentMajors.Remove(studentMajor);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }
