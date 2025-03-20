@@ -17,14 +17,12 @@ namespace StudentRecordsAPI.Controllers
             _majorService = majorService;
         }
 
-        // GET: api/Major
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Major>>> GetMajors()
         {
             return await _majorService.GetMajorsAsync();
         }
 
-        // GET: api/Major/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Major>> GetMajorById(int id)
         {
@@ -36,7 +34,17 @@ namespace StudentRecordsAPI.Controllers
             return major;
         }
 
-        // POST: api/Major
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<Major>> GetMajorWithDetails(int id)
+        {
+            var major = await _majorService.GetMajorWithDetailsAsync(id);
+            if (major == null)
+            {
+                return NotFound();
+            }
+            return major;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Major>> PostMajor(Major major)
         {
@@ -44,7 +52,6 @@ namespace StudentRecordsAPI.Controllers
             return CreatedAtAction(nameof(GetMajorById), new { id = newMajor.MajorID }, newMajor);
         }
 
-        // PUT: api/Major/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMajor(int id, Major major)
         {
@@ -56,7 +63,6 @@ namespace StudentRecordsAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Major/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMajor(int id)
         {

@@ -16,19 +16,25 @@ namespace StudentRecordsAPI.Services
             _context = context;
         }
 
-        // Get all students
         public async Task<List<Student>> GetStudentsAsync()
         {
             return await _context.Students.ToListAsync();
         }
 
-        // Get a student by ID
         public async Task<Student?> GetStudentByIdAsync(string studentId)
         {
-            return await _context.Students.FindAsync(studentId);
+            return await _context.Students.FirstOrDefaultAsync(s => s.StudentID == studentId);
         }
 
-        // Add a new student
+        public async Task<Student?> GetStudentWithDetailsAsync(string studentId)
+        {
+            return await _context.Students
+                .Include(s => s.Major)
+                .Include(s => s.StudentCourses)
+                .ThenInclude(sc => sc.Course)
+                .FirstOrDefaultAsync(s => s.StudentID == studentId);
+        }
+
         public async Task<Student> AddStudentAsync(Student student)
         {
             _context.Students.Add(student);
@@ -36,7 +42,6 @@ namespace StudentRecordsAPI.Services
             return student;
         }
 
-        // Update a student's information
         public async Task<bool> UpdateStudentAsync(string studentId, Student student)
         {
             if (studentId != student.StudentID)
@@ -64,7 +69,6 @@ namespace StudentRecordsAPI.Services
             }
         }
 
-        // Delete a student
         public async Task<bool> DeleteStudentAsync(string studentId)
         {
             var student = await _context.Students.FindAsync(studentId);
@@ -78,13 +82,13 @@ namespace StudentRecordsAPI.Services
             return true;
         }
 
-        // Get students by Major ID
         public async Task<List<Student>> GetStudentsByMajorAsync(int majorId)
         {
-            return await _context.Students.Where(s => s.MajorID == majorId).ToListAsync();
+            return await _context.Students
+                .Where(s => s.MajorID == majorId)
+                .ToListAsync();
         }
 
-        // Get students enrolled in a specific course
         public async Task<List<Student>> GetStudentsByCourseAsync(int courseId)
         {
             return await _context.StudentCourses

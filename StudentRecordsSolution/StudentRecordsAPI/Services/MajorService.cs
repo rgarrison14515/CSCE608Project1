@@ -18,19 +18,20 @@ namespace StudentRecordsAPI.Services
 
         public async Task<List<Major>> GetMajorsAsync()
         {
-            return await _context.Majors
-                .Include(m => m.Department)
-                .Include(m => m.StudentMajors)
-                .ThenInclude(sm => sm.Student) // Include students assigned to the major
-                .ToListAsync();
+            return await _context.Majors.ToListAsync();
         }
 
         public async Task<Major?> GetMajorByIdAsync(int id)
         {
+            return await _context.Majors.FirstOrDefaultAsync(m => m.MajorID == id);
+        }
+
+        public async Task<Major?> GetMajorWithDetailsAsync(int id)
+        {
             return await _context.Majors
                 .Include(m => m.Department)
                 .Include(m => m.StudentMajors)
-                .ThenInclude(sm => sm.Student) // Include students assigned to the major
+                .ThenInclude(sm => sm.Student)
                 .FirstOrDefaultAsync(m => m.MajorID == id);
         }
 

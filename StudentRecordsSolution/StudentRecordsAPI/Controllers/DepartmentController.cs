@@ -17,14 +17,12 @@ namespace StudentRecordsAPI.Controllers
             _departmentService = departmentService;
         }
 
-        // GET: api/Department
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
         {
             return await _departmentService.GetDepartmentsAsync();
         }
 
-        // GET: api/Department/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Department>> GetDepartment(int id)
         {
@@ -36,7 +34,17 @@ namespace StudentRecordsAPI.Controllers
             return department;
         }
 
-        // POST: api/Department
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<Department>> GetDepartmentWithDetails(int id)
+        {
+            var department = await _departmentService.GetDepartmentWithDetailsAsync(id);
+            if (department == null)
+            {
+                return NotFound();
+            }
+            return department;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Department>> PostDepartment(Department department)
         {
@@ -44,7 +52,6 @@ namespace StudentRecordsAPI.Controllers
             return CreatedAtAction(nameof(GetDepartment), new { id = newDepartment.DepartmentID }, newDepartment);
         }
 
-        // PUT: api/Department/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDepartment(int id, Department department)
         {
@@ -56,7 +63,6 @@ namespace StudentRecordsAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Department/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {

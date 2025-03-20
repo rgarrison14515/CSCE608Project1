@@ -18,14 +18,15 @@ namespace StudentRecordsAPI.Services
 
         public async Task<List<Department>> GetDepartmentsAsync()
         {
-            return await _context.Departments
-                .Include(d => d.FacultyMembers)
-                .Include(d => d.Courses)
-                .Include(d => d.Majors)
-                .ToListAsync();
+            return await _context.Departments.ToListAsync();
         }
 
         public async Task<Department?> GetDepartmentByIdAsync(int id)
+        {
+            return await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentID == id);
+        }
+
+        public async Task<Department?> GetDepartmentWithDetailsAsync(int id)
         {
             return await _context.Departments
                 .Include(d => d.FacultyMembers)

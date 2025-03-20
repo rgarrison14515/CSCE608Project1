@@ -17,14 +17,12 @@ namespace StudentRecordsAPI.Controllers
             _studentCourseService = studentCourseService;
         }
 
-        // GET: api/StudentCourse
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentCourse>>> GetStudentCourses()
         {
             return await _studentCourseService.GetStudentCoursesAsync();
         }
 
-        // GET: api/StudentCourse/{studentId}/{courseId}
         [HttpGet("{studentId}/{courseId}")]
         public async Task<ActionResult<StudentCourse>> GetStudentCourse(string studentId, int courseId)
         {
@@ -36,7 +34,17 @@ namespace StudentRecordsAPI.Controllers
             return studentCourse;
         }
 
-        // POST: api/StudentCourse
+        [HttpGet("{studentId}/{courseId}/details")]
+        public async Task<ActionResult<StudentCourse>> GetStudentCourseWithDetails(string studentId, int courseId)
+        {
+            var studentCourse = await _studentCourseService.GetStudentCourseWithDetailsAsync(studentId, courseId);
+            if (studentCourse == null)
+            {
+                return NotFound();
+            }
+            return studentCourse;
+        }
+
         [HttpPost]
         public async Task<ActionResult<StudentCourse>> PostStudentCourse(StudentCourse studentCourse)
         {
@@ -49,7 +57,6 @@ namespace StudentRecordsAPI.Controllers
             return CreatedAtAction(nameof(GetStudentCourse), new { studentId = studentCourse.StudentID, courseId = studentCourse.CourseID }, studentCourse);
         }
 
-        // DELETE: api/StudentCourse/{studentId}/{courseId}
         [HttpDelete("{studentId}/{courseId}")]
         public async Task<IActionResult> DeleteStudentCourse(string studentId, int courseId)
         {

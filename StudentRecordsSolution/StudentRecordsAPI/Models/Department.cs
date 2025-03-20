@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace StudentRecordsAPI.Models
 {
-    [Table("Department")] //  Explicitly map to "Department" table
+    [Table("Department")]
     public class Department
     {
         [Key]
@@ -13,11 +14,16 @@ namespace StudentRecordsAPI.Models
         public string Name { get; set; }
 
         [Required]
-        [StringLength(10)] //  Ensures abbreviation follows the VARCHAR(10) limit in SQL
+        [StringLength(10)]
         public string Abbreviation { get; set; }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<Faculty>? FacultyMembers { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<Course>? Courses { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<Major>? Majors { get; set; }
     }
 }

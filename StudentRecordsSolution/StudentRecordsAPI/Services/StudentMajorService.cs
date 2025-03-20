@@ -18,13 +18,16 @@ namespace StudentRecordsAPI.Services
 
         public async Task<List<StudentMajor>> GetStudentMajorsAsync()
         {
-            return await _context.StudentMajors
-                .Include(sm => sm.Student)
-                .Include(sm => sm.Major)
-                .ToListAsync();
+            return await _context.StudentMajors.ToListAsync();
         }
 
         public async Task<StudentMajor?> GetStudentMajorAsync(string studentId, int majorId)
+        {
+            return await _context.StudentMajors
+                .FirstOrDefaultAsync(sm => sm.StudentID == studentId && sm.MajorID == majorId);
+        }
+
+        public async Task<StudentMajor?> GetStudentMajorWithDetailsAsync(string studentId, int majorId)
         {
             return await _context.StudentMajors
                 .Include(sm => sm.Student)
@@ -36,12 +39,12 @@ namespace StudentRecordsAPI.Services
         {
             if (!_context.Students.Any(s => s.StudentID == studentMajor.StudentID))
             {
-                return null; // Student does not exist
+                return null;
             }
 
             if (!_context.Majors.Any(m => m.MajorID == studentMajor.MajorID))
             {
-                return null; // Major does not exist
+                return null;
             }
 
             _context.StudentMajors.Add(studentMajor);
@@ -53,7 +56,7 @@ namespace StudentRecordsAPI.Services
             }
             catch (DbUpdateException)
             {
-                return null; // Conflict - student is already assigned to this major
+                return null;
             }
         }
 

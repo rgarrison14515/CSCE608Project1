@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudentRecordsAPI.Models;
-using StudentRecordsAPI.Services; // Import the service
+using StudentRecordsAPI.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,14 +17,12 @@ namespace StudentRecordsAPI.Controllers
             _studentService = studentService;
         }
 
-        // GET: api/Student
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
         {
             return await _studentService.GetStudentsAsync();
         }
 
-        // GET: api/Student/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(string id)
         {
@@ -36,7 +34,17 @@ namespace StudentRecordsAPI.Controllers
             return student;
         }
 
-        // POST: api/Student
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<Student>> GetStudentWithDetails(string id)
+        {
+            var student = await _studentService.GetStudentWithDetailsAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            return student;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Student>> PostStudent(Student student)
         {
@@ -44,7 +52,6 @@ namespace StudentRecordsAPI.Controllers
             return CreatedAtAction(nameof(GetStudent), new { id = newStudent.StudentID }, newStudent);
         }
 
-        // PUT: api/Student/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStudent(string id, Student student)
         {
@@ -56,7 +63,6 @@ namespace StudentRecordsAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Student/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(string id)
         {
@@ -68,14 +74,12 @@ namespace StudentRecordsAPI.Controllers
             return NoContent();
         }
 
-        // GET: api/Student/major/{majorId}
         [HttpGet("major/{majorId}")]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudentsByMajor(int majorId)
         {
             return await _studentService.GetStudentsByMajorAsync(majorId);
         }
 
-        // GET: api/Student/course/{courseId}
         [HttpGet("course/{courseId}")]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudentsByCourse(int courseId)
         {

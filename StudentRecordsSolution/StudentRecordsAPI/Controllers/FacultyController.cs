@@ -17,14 +17,12 @@ namespace StudentRecordsAPI.Controllers
             _facultyService = facultyService;
         }
 
-        // GET: api/Faculty
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Faculty>>> GetFaculty()
         {
             return await _facultyService.GetFacultyAsync();
         }
 
-        // GET: api/Faculty/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Faculty>> GetFacultyById(int id)
         {
@@ -36,7 +34,17 @@ namespace StudentRecordsAPI.Controllers
             return faculty;
         }
 
-        // POST: api/Faculty
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<Faculty>> GetFacultyWithDetails(int id)
+        {
+            var faculty = await _facultyService.GetFacultyWithDetailsAsync(id);
+            if (faculty == null)
+            {
+                return NotFound();
+            }
+            return faculty;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Faculty>> PostFaculty(Faculty faculty)
         {
@@ -44,7 +52,6 @@ namespace StudentRecordsAPI.Controllers
             return CreatedAtAction(nameof(GetFacultyById), new { id = newFaculty.FacultyID }, newFaculty);
         }
 
-        // PUT: api/Faculty/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutFaculty(int id, Faculty faculty)
         {
@@ -56,7 +63,6 @@ namespace StudentRecordsAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Faculty/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFaculty(int id)
         {

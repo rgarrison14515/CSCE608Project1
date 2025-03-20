@@ -18,13 +18,16 @@ namespace StudentRecordsAPI.Services
 
         public async Task<List<StudentCourse>> GetStudentCoursesAsync()
         {
-            return await _context.StudentCourses
-                .Include(sc => sc.Student)
-                .Include(sc => sc.Course)
-                .ToListAsync();
+            return await _context.StudentCourses.ToListAsync();
         }
 
         public async Task<StudentCourse?> GetStudentCourseAsync(string studentId, int courseId)
+        {
+            return await _context.StudentCourses
+                .FirstOrDefaultAsync(sc => sc.StudentID == studentId && sc.CourseID == courseId);
+        }
+
+        public async Task<StudentCourse?> GetStudentCourseWithDetailsAsync(string studentId, int courseId)
         {
             return await _context.StudentCourses
                 .Include(sc => sc.Student)
@@ -36,12 +39,12 @@ namespace StudentRecordsAPI.Services
         {
             if (!_context.Students.Any(s => s.StudentID == studentCourse.StudentID))
             {
-                return null; // Student does not exist
+                return null;
             }
 
             if (!_context.Courses.Any(c => c.CourseID == studentCourse.CourseID))
             {
-                return null; // Course does not exist
+                return null;
             }
 
             _context.StudentCourses.Add(studentCourse);
@@ -53,7 +56,7 @@ namespace StudentRecordsAPI.Services
             }
             catch (DbUpdateException)
             {
-                return null; // Conflict - student is already enrolled
+                return null;
             }
         }
 
