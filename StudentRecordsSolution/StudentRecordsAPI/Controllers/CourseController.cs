@@ -52,5 +52,32 @@ namespace StudentRecordsAPI.Controllers
             }
             return course;
         }
+
+        [HttpGet("faculty/name/{facultyName}")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByFacultyName(string facultyName)
+        {
+            var courses = await _courseService.GetCoursesByFacultyNameAsync(facultyName);
+
+            if (courses == null || courses.Count == 0)
+            {
+                return NotFound($"No courses found for faculty member: {facultyName}");
+            }
+
+            return courses;
+        }
+
+        [HttpGet("term/name/{termName}")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByTermName(string termName)
+        {
+            var courses = await _courseService.GetCoursesByTermNameAsync(termName);
+
+            if (courses == null || courses.Count == 0)
+            {
+                return NotFound($"No courses found for academic term: {termName}");
+            }
+
+            return courses;
+        }
+
     }
 }

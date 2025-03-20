@@ -3,6 +3,7 @@ using StudentRecordsAPI.Models;
 using StudentRecordsAPI.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using StudentRecordsAPI.Models.DTOs; // Import DTOs
 
 namespace StudentRecordsAPI.Controllers
 {
@@ -85,5 +86,46 @@ namespace StudentRecordsAPI.Controllers
         {
             return await _studentService.GetStudentsByCourseAsync(courseId);
         }
+
+        [HttpGet("course/name/{courseName}")]
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudentsByCourseName(string courseName)
+        {
+            var students = await _studentService.GetStudentsByCourseNameAsync(courseName);
+
+            if (students == null || students.Count == 0)
+            {
+                return NotFound($"No students found for course: {courseName}");
+            }
+
+            return students;
+        }
+
+        [HttpGet("major/name/{majorName}")]
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudentsByMajorName(string majorName)
+        {
+            var students = await _studentService.GetStudentsByMajorNameAsync(majorName);
+
+            if (students == null || students.Count == 0)
+            {
+                return NotFound($"No students found for major: {majorName}");
+            }
+
+            return students;
+        }
+
+        [HttpGet("multiple-majors")]
+        public async Task<ActionResult<IEnumerable<StudentWithMajorsDto>>> GetStudentsWithMultipleMajors()
+        {
+            var students = await _studentService.GetStudentsWithMultipleMajorsAsync();
+
+            if (students == null || students.Count == 0)
+            {
+                return NotFound("No students found with multiple majors.");
+            }
+
+            return students;
+        }
+
+
     }
 }

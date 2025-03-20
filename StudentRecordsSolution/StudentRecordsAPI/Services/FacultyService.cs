@@ -80,5 +80,30 @@ namespace StudentRecordsAPI.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<Faculty>> GetFacultyByDepartmentNameAsync(string departmentName)
+        {
+            var department = await _context.Departments
+                .Where(d => d.Name == departmentName)
+                .Select(d => d.DepartmentID)
+                .FirstOrDefaultAsync();
+
+            if (department == 0) // If no department found
+            {
+                return new List<Faculty>();
+            }
+
+            return await _context.Faculty
+                .Where(f => f.DepartmentID == department)
+                .Select(f => new Faculty
+                {
+                    FacultyID = f.FacultyID,
+                    Name = f.Name,
+                    Email = f.Email,
+                    DepartmentID = f.DepartmentID
+                })
+                .ToListAsync();
+        }
+
     }
 }

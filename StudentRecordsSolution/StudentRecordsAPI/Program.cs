@@ -1,15 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using StudentRecordsAPI.Data;
-using StudentRecordsAPI.Services; // Import the service
-using System.Text.Json.Serialization; //  Import this!
+using StudentRecordsAPI.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; //  Prevent circular reference issue
+        // Prevent circular reference issues while keeping data structures clean
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -31,7 +33,7 @@ builder.Services.AddScoped<StudentMajorService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

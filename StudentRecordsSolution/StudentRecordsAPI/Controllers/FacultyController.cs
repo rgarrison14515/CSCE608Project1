@@ -73,5 +73,19 @@ namespace StudentRecordsAPI.Controllers
             }
             return NoContent();
         }
+
+        [HttpGet("department/name/{departmentName}")]
+        public async Task<ActionResult<IEnumerable<Faculty>>> GetFacultyByDepartmentName(string departmentName)
+        {
+            var faculty = await _facultyService.GetFacultyByDepartmentNameAsync(departmentName);
+
+            if (faculty == null || faculty.Count == 0)
+            {
+                return NotFound($"No faculty members found for department: {departmentName}");
+            }
+
+            return faculty;
+        }
+
     }
 }
