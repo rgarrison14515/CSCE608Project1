@@ -1,11 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using StudentRecordsAPI.Data;
 using StudentRecordsAPI.Services; // Import the service
+using System.Text.Json.Serialization; //  Import this!
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; //  Prevent circular reference issue
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

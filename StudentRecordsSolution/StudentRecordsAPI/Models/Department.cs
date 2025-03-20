@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentRecordsAPI.Models
 {
-    [Table("Department")] // 👈 Explicitly map to "Department" table
+    [Table("Department")] //  Explicitly map to "Department" table
     public class Department
     {
         [Key]
@@ -13,7 +13,7 @@ namespace StudentRecordsAPI.Models
         public string Name { get; set; }
 
         [Required]
-        [StringLength(10)] // 👈 Ensures abbreviation follows the VARCHAR(10) limit in SQL
+        [StringLength(10)] //  Ensures abbreviation follows the VARCHAR(10) limit in SQL
         public string Abbreviation { get; set; }
 
         public ICollection<Faculty>? FacultyMembers { get; set; }

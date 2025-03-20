@@ -24,7 +24,6 @@ namespace StudentRecordsAPI.Controllers
             return await _termService.GetTermsAsync();
         }
 
-        // GET: api/Term/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Term>> GetTermById(int id)
         {
@@ -35,6 +34,19 @@ namespace StudentRecordsAPI.Controllers
             }
             return term;
         }
+
+        // New endpoint to get a term *with* its courses
+        [HttpGet("with-courses/{id}")]
+        public async Task<ActionResult<Term>> GetTermWithCoursesById(int id)
+        {
+            var term = await _termService.GetTermWithCoursesByIdAsync(id);
+            if (term == null)
+            {
+                return NotFound();
+            }
+            return term;
+        }
+
 
         // POST: api/Term
         [HttpPost]

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentRecordsAPI.Models
 {
-    [Table("Student")] // 🔹 This ensures EF uses "Student" instead of "Students"
+    [Table("Student")] // This ensures EF uses "Student" instead of "Students"
     public class Student
     {
         [Key]

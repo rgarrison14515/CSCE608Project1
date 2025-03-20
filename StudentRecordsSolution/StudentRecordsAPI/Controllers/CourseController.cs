@@ -17,14 +17,7 @@ namespace StudentRecordsAPI.Controllers
             _courseService = courseService;
         }
 
-        // GET: api/Course
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
-        {
-            return await _courseService.GetCoursesAsync();
-        }
-
-        // GET: api/Course/{id}
+        //  Returns Course basic details (No related data)
         [HttpGet("{id}")]
         public async Task<ActionResult<Course>> GetCourse(int id)
         {
@@ -36,57 +29,28 @@ namespace StudentRecordsAPI.Controllers
             return course;
         }
 
-        // POST: api/Course
-        [HttpPost]
-        public async Task<ActionResult<Course>> PostCourse(Course course)
+        //  Returns Course *WITH* Department, Faculty, and Term
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<Course>> GetCourseWithDetails(int id)
         {
-            var newCourse = await _courseService.AddCourseAsync(course);
-            return CreatedAtAction(nameof(GetCourse), new { id = newCourse.CourseID }, newCourse);
-        }
-
-        // PUT: api/Course/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(int id, Course course)
-        {
-            var updated = await _courseService.UpdateCourseAsync(id, course);
-            if (!updated)
+            var course = await _courseService.GetCourseWithDetailsAsync(id);
+            if (course == null)
             {
                 return NotFound();
             }
-            return NoContent();
+            return course;
         }
 
-        // DELETE: api/Course/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(int id)
+        //  Returns Course *WITH* Enrolled Students
+        [HttpGet("{id}/students")]
+        public async Task<ActionResult<Course>> GetCourseWithStudents(int id)
         {
-            var deleted = await _courseService.DeleteCourseAsync(id);
-            if (!deleted)
+            var course = await _courseService.GetCourseWithStudentsAsync(id);
+            if (course == null)
             {
                 return NotFound();
             }
-            return NoContent();
-        }
-
-        // GET: api/Course/faculty/{facultyId}
-        [HttpGet("faculty/{facultyId}")]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByFaculty(int facultyId)
-        {
-            return await _courseService.GetCoursesByFacultyAsync(facultyId);
-        }
-
-        // GET: api/Course/department/{departmentId}
-        [HttpGet("department/{departmentId}")]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByDepartment(int departmentId)
-        {
-            return await _courseService.GetCoursesByDepartmentAsync(departmentId);
-        }
-
-        // GET: api/Course/term/{termId}
-        [HttpGet("term/{termId}")]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByTerm(int termId)
-        {
-            return await _courseService.GetCoursesByTermAsync(termId);
+            return course;
         }
     }
 }

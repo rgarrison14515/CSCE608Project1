@@ -26,9 +26,16 @@ namespace StudentRecordsAPI.Services
         public async Task<Term?> GetTermByIdAsync(int id)
         {
             return await _context.Terms
-                .Include(t => t.Courses) // Include related courses
+                .FirstOrDefaultAsync(t => t.TermID == id); //  Only the term, no courses
+        }
+
+        public async Task<Term?> GetTermWithCoursesByIdAsync(int id)
+        {
+            return await _context.Terms
+                .Include(t => t.Courses) //  Now we include courses
                 .FirstOrDefaultAsync(t => t.TermID == id);
         }
+
 
         public async Task<Term> AddTermAsync(Term term)
         {
