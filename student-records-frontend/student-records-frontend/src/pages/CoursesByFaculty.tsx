@@ -1,0 +1,1 @@
+//Query for getting courses taught by faculty

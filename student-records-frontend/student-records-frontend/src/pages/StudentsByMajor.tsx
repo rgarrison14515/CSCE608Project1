@@ -1,0 +1,1 @@
+//Query for getting students by Major
