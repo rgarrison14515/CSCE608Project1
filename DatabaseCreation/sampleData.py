@@ -120,4 +120,4 @@ with open("studentmajor.csv", "w", newline="") as f:
     writer.writeheader()
     writer.writerows(student_majors)
 
-print("✅ CSV files generated successfully!")
+print("CSV files generated successfully!")
