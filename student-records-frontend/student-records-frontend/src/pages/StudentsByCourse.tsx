@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Student {
   studentID: string;
@@ -12,6 +13,7 @@ export default function StudentsByCourse() {
   const [students, setStudents] = useState<Student[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearch = async () => {
     setLoading(true);
@@ -33,7 +35,11 @@ export default function StudentsByCourse() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ padding: '2rem', position: 'relative' }}>
+      <button onClick={() => navigate('/')} style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+        Home
+      </button>
+
       <h2>Find Students by Course</h2>
 
       <div style={{ marginBottom: '1rem' }}>

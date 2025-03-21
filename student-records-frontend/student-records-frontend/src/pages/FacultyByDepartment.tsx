@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Faculty {
   facultyID: number;
@@ -11,6 +12,7 @@ export default function FacultyByDepartment() {
   const [departmentName, setDepartmentName] = useState('');
   const [facultyList, setFacultyList] = useState<Faculty[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSearch = async () => {
     try {
@@ -28,7 +30,11 @@ export default function FacultyByDepartment() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ padding: '2rem', position: 'relative' }}>
+      <button onClick={() => navigate('/')} style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+        Home
+      </button>
+
       <h2>Faculty in a Department</h2>
 
       <input

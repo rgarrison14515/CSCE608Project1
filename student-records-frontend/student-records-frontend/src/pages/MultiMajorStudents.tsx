@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface StudentWithMajors {
   studentID: string;
@@ -10,6 +11,7 @@ interface StudentWithMajors {
 export default function MultiMajorStudents() {
   const [students, setStudents] = useState<StudentWithMajors[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const fetchStudents = async () => {
     try {
@@ -27,7 +29,11 @@ export default function MultiMajorStudents() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ padding: '2rem', position: 'relative' }}>
+      <button onClick={() => navigate('/')} style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+        Home
+      </button>
+
       <h2>Students with Multiple Majors</h2>
       <button onClick={fetchStudents}>Fetch Students</button>
 
